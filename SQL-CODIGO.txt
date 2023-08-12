@@ -1,0 +1,133 @@
+--DDL
+--Criar um banco de dados para um sistema de RPG Online
+CREATE DATABASE RPGOnlineBD
+
+ 
+
+USE RPGOnlineDB
+
+ 
+
+-- Usuarios, Classes, Personagens, Habilidades, ClasseHabilidade
+--criando a tabela usuario
+CREATE TABLE Usuario(
+    UsuarioId INT PRIMARY KEY IDENTITY,
+    Email VARCHAR(100) UNIQUE NOT NULL,
+    Senha VARCHAR(255)
+)
+
+ 
+
+CREATE TABLE Classes(
+    ClasseId INT PRIMARY KEY IDENTITY
+    ,Nome VARCHAR(50) UNIQUE NOT NULL
+    ,Descricao VARCHAR(255)
+)
+
+ 
+
+CREATE TABLE Personagens(
+    PersonagemId INT PRIMARY KEY IDENTITY,
+    NomePersonagem VARCHAR(15) UNIQUE NOT NULL,
+    UsuarioId INT UNIQUE FOREIGN KEY REFERENCES Usuario(UsuarioId),
+    ClasseId INT UNIQUE FOREIGN KEY REFERENCES Classes(ClasseId)
+)
+
+ 
+
+CREATE TABLE Habilidades(
+    HabilidadeId INT PRIMARY KEY IDENTITY,
+    Nome VARCHAR(200) UNIQUE NOT NULL
+)
+
+ 
+ --ClasseHabilidade é a tabela intermediaria para pegar os ids da tabela classe e habilidade que icará com ids de chave estrangeira
+CREATE TABLE ClasseHabilidade( 
+    ClasseId INT FOREIGN KEY REFERENCES Classes(ClasseId),
+    HabilidadeId INT FOREIGN KEY REFERENCES Habilidades(HabilidadeId)
+)
+
+ 
+--DML
+--Inserindo usuario
+INSERT INTO Usuario VALUES ('caique@senai.com.br','123456')
+INSERT INTO Classes VALUES ('Barbaro', 'Ele é realmente barbaro')
+INSERT INTO Habilidades VALUES ('Lanca Mortal'), ('Escudo Supremo') --Usa os parenteses se quiser incluir dois registros na tabela
+INSERT INTO Personagens (NomePersonagem, UsuarioId, ClasseId) VALUES ('MajorTom', 1, 1)
+INSERT INTO ClasseHabilidade (ClasseId, HabilidadeId) VALUES (1,1), (1,2)
+
+--Inserindo outro usuario
+INSERT INTO Usuario VALUES ('pedro@senai.com.br','654321')
+INSERT INTO Classes VALUES ('arqueiro', 'Ele é bom de mira, as vezes')
+INSERT INTO Habilidades VALUES ('Arco com fitinhas')
+INSERT INTO Personagens (NomePersonagem, UsuarioId, ClasseId) VALUES ('Sova', 2, 2)
+INSERT INTO ClasseHabilidade (ClasseId, HabilidadeId) VALUES (2,1), (2,2)
+
+--Alteraçao
+UPDATE Usuario 
+SET Senha = '333333'
+WHERE UsuarioId = 1
+
+--DQL
+--consultas
+SELECT * FROM USUARIO
+SELECT * FROM Classes
+SELECT * FROM ClasseHabilidade
+SELECT * FROM Habilidades
+SELECT * FROM Personagens
+
+--iNNER JOIN
+SELECT * FROM Personagens
+INNER JOIN Classes
+ON Personagens.ClasseId = Classes.ClasseId --Usando o INNER JOIN mostra os registros que estao nos campos amarrados as classes e aos personagens
+
+
+-- EXEMPLO JOIN
+--criando um banco de dados para fazer exemplo dE INNER JOIN COM LEFT, RIGHT E FULL OUTER
+CREATE DATABASE ExemploJoin
+
+USE ExemploJoin --Para usar o banco
+
+-- DDL
+
+CREATE TABLE TabelaA(
+    nome VARCHAR(100) NULL
+)
+
+ 
+CREATE TABLE TabelaB(
+    nome VARCHAR(100) NULL
+)
+
+--DML
+INSERT INTO TabelaA VALUES ('Fernanda')
+INSERT INTO TabelaA VALUES ('Josefa')
+INSERT INTO TabelaA VALUES ('Luiz')
+INSERT INTO TabelaA VALUES ('Cleber')
+
+INSERT INTO TabelaB VALUES ('Carlos'), ('Manoel'), ('Luiz'), ('Fernanda')
+
+--DQL
+SELECT * FROM TabelaA
+SELECT * FROM TabelaB
+
+--seleciona todos os registros
+SELECT TabelaA.nome, TabelaB.nome FROM TabelaA
+INNER JOIN TabelaB
+ON TabelaA.nome = TabelaB.nome
+
+--tras os registros da tabela da esquerda, e os registros que estao iguais na tabela da direita, os que nao forem iguais vem como nulo
+SELECT TabelaA.nome, TabelaB.nome FROM TabelaA
+LEFT JOIN TabelaB
+ON TabelaA.nome = TabelaB.nome
+
+--o RIGHT faz ao contrario
+SELECT TabelaA.nome, TabelaB.nome FROM TabelaA
+RIGHT JOIN TabelaB
+ON TabelaA.nome = TabelaB.nome
+
+--traz todos os registros das duas tabelas
+SELECT TabelaA.nome, TabelaB.nome FROM TabelaA
+FULL OUTER JOIN TabelaB
+ON TabelaA.nome = TabelaB.nome
+
